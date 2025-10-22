@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式元素周期表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .compound-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .compound-display {
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .compound-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .compound-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(50, 205, 50, 0.7);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .compound-link:hover {
+            background: rgba(50, 205, 50, 0.9);
+            transform: scale(1.05);
+        }
+        
+        .periodic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 4px;
+            margin: 0 auto;
+            max-width: 1000px;
+        }
+        
+        .element {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .element:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .element.selected {
+            background: rgba(255, 215, 0, 0.7);
+            box-shadow: 0 0 15px gold;
+        }
+        
+        .element.related {
+            background: rgba(65, 105, 225, 0.7);
+            box-shadow: 0 0 10px royalblue;
+        }
+        
+        .element.compound {
+            background: rgba(50, 205, 50, 0.7);
+            box-shadow: 0 0 10px limegreen;
+        }
+        
+        .element-number {
+            font-size: 0.7rem;
+            align-self: flex-start;
+        }
+        
+        .element-symbol {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+        
+        .element-name {
+            font-size: 0.7rem;
+        }
+        
+        .empty {
+            background: transparent;
+            border: none;
+            cursor: default;
+        }
+        
+        .lanthanides-actinides {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .lanthanides, .actinides {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 4px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .series-title {
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .periodic-table {
+                grid-template-columns: repeat(9, 1fr);
+                grid-template-rows: repeat(18, 1fr);
+                max-width: 500px;
+            }
+            
+            .lanthanides, .actinides {
+                grid-template-columns: repeat(8, 1fr);
+                max-width: 450px;
+            }
+            
+            .element {
+                min-height: 45px;
+                padding: 4px 2px;
+            }
+            
+            .element-symbol {
+                font-size: 1rem;
+            }
+            
+            .element-name {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>交互式元素周期表</h1>
+            <p class="subtitle">点击元素查看相关元素，再次点击形成化合物</p>
+        </header>
+        
+        <div class="instructions">
+            <p><strong>使用说明：</strong> 首先点击一个元素，与其相关的元素会高亮显示。然后点击高亮元素中的一个，这两个元素将形成一个化合物。点击化合物链接查看详情。</p>
+        </div>
+        
+        <div class="compound-section">
+            <div class="compound-display" id="compoundDisplay">
+                <p>选择一个元素开始...</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="resetBtn">重置选择</button>
+            <button id="exampleBtn">查看示例</button>
+        </div>
+        
+        <div class="periodic-container">
+            <div class="periodic-table" id="periodicTable">
+                <!-- 元素周期表将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="lanthanides-actinides">
+                <div class="series-title">镧系元素</div>
+                <div class="lanthanides" id="lanthanides">
+                    <!-- 镧系元素 -->
+                </div>
+                
+                <div class="series-title">锕系元素</div>
+                <div class="actinides" id="actinides">
+                    <!-- 锕系元素 -->
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>交互式元素周期表 &copy; 2025 | 学校</p>
+        </footer>
+    </div>
+
+    <script>
+        // 元素数据
+        const elements = [
+            // 第一周期
+            { number: 1, symbol: "H", name: "氢", group: 1, period: 1, related: [6, 7, 8, 9, 16, 17] },
+            { number: 2, symbol: "He", name: "氦", group: 18, period: 1, related: [] },
+            
+            // 第二周期
+            { number: 3, symbol: "Li", name: "锂", group: 1, period: 2, related: [8, 9, 16, 17] },
+            { number: 4, symbol: "Be", name: "铍", group: 2, period: 2, related: [8, 9, 16, 17] },
+            { number: 5, symbol: "B", name: "硼", group: 13, period: 2, related: [8, 9, 16, 17] },
+            { number: 6, symbol: "C", name: "碳", group: 14, period: 2, related: [1, 7, 8, 9, 16, 17] },
+            { number: 7, symbol: "N", name: "氮", group: 15, period: 2, related: [1, 6, 8, 9, 16, 17] },
+            { number: 8, symbol: "O", name: "氧", group: 16, period: 2, related: [1, 3, 4, 6, 7, 11, 12, 13, 16, 17, 19, 20] },
+            { number: 9, symbol: "F", name: "氟", group: 17, period: 2, related: [1, 3, 4, 6, 7, 11, 12, 13, 16, 17, 19, 20] },
+            { number: 10, symbol: "Ne", name: "氖", group: 18, period: 2, related: [] },
+            
+            // 第三周期
+            { number: 11, symbol: "Na", name: "钠", group: 1, period: 3, related: [8, 9, 16, 17] },
+            { number: 12, symbol: "Mg", name: "镁", group: 2, period: 3, related: [8, 9, 16, 17] },
+            { number: 13, symbol: "Al", name: "铝", group: 13, period: 3, related: [8, 9, 16, 17] },
+            { number: 14, symbol: "Si", name: "硅", group: 14, period: 3, related: [8, 9, 16, 17] },
+            { number: 15, symbol: "P", name: "磷", group: 15, period: 3, related: [8, 9, 16, 17] },
+            { number: 16, symbol: "S", name: "硫", group: 16, period: 3, related: [1, 6, 7, 8, 9, 11, 12, 13, 17, 19, 20] },
+            { number: 17, symbol: "Cl", name: "氯", group: 17, period: 3, related: [1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 16, 19, 20] },
+            { number: 18, symbol: "Ar", name: "氩", group: 18, period: 3, related: [] },
+            
+            // 第四周期
+            { number: 19, symbol: "K", name: "钾", group: 1, period: 4, related: [8, 9, 16, 17] },
+            { number: 20, symbol: "Ca", name: "钙", group: 2, period: 4, related: [8, 9, 16, 17] },
+            { number: 21, symbol: "Sc", name: "钪", group: 3, period: 4, related: [8, 9, 16, 17] },
+            { number: 22, symbol: "Ti", name: "钛", group: 4, period: 4, related: [8, 9, 16, 17] },
+            { number: 23, symbol: "V", name: "钒", group: 5, period: 4, related: [8, 9, 16, 17] },
+            { number: 24, symbol: "Cr", name: "铬", group: 6, period: 4, related: [8, 9, 16, 17] },
+            { number: 25, symbol: "Mn", name: "锰", group: 7, period: 4, related: [8, 9, 16, 17] },
+            { number: 26, symbol: "Fe", name: "铁", group: 8, period: 4, related: [8, 9, 16, 17] },
+            { number: 27, symbol: "Co", name: "钴", group: 9, period: 4, related: [8, 9, 16, 17] },
+            { number: 28, symbol: "Ni", name: "镍", group: 10, period: 4, related: [8, 9, 16, 17] },
+            { number: 29, symbol: "Cu", name: "铜", group: 11, period: 4, related: [8, 9, 16, 17] },
+            { number: 30, symbol: "Zn", name: "锌", group: 12, period: 4, related: [8, 9, 16, 17] },
+            { number: 31, symbol: "Ga", name: "镓", group: 13, period: 4, related: [8, 9, 16, 17] },
+            { number: 32, symbol: "Ge", name: "锗", group: 14, period: 4, related: [8, 9, 16, 17] },
+            { number: 33, symbol: "As", name: "砷", group: 15, period: 4, related: [8, 9, 16, 17] },
+            { number: 34, symbol: "Se", name: "硒", group: 16, period: 4, related: [8, 9, 16, 17] },
+            { number: 35, symbol: "Br", name: "溴", group: 17, period: 4, related: [1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 16, 19, 20] },
+            { number: 36, symbol: "Kr", name: "氪", group: 18, period: 4, related: [] },
+            
+            // 第五周期
+            { number: 37, symbol: "Rb", name: "铷", group: 1, period: 5, related: [8, 9, 16, 17] },
+            { number: 38, symbol: "Sr", name: "锶", group: 2, period: 5, related: [8, 9, 16, 17] },
+            { number: 39, symbol: "Y", name: "钇", group: 3, period: 5, related: [8, 9, 16, 17] },
+            { number: 40, symbol: "Zr", name: "锆", group: 4, period: 5, related: [8, 9, 16, 17] },
+            { number: 41, symbol: "Nb", name: "铌", group: 5, period: 5, related: [8, 9, 16, 17] },
+            { number: 42, symbol: "Mo", name: "钼", group: 6, period: 5, related: [8, 9, 16, 17] },
+            { number: 43, symbol: "Tc", name: "锝", group: 7, period: 5, related: [8, 9, 16, 17] },
+            { number: 44, symbol: "Ru", name: "钌", group: 8, period: 5, related: [8, 9, 16, 17] },
+            { number: 45, symbol: "Rh", name: "铑", group: 9, period: 5, related: [8, 9, 16, 17] },
+            { number: 46, symbol: "Pd", name: "钯", group: 10, period: 5, related: [8, 9, 16, 17] },
+            { number: 47, symbol: "Ag", name: "银", group: 11, period: 5, related: [8, 9, 16, 17] },
+            { number: 48, symbol: "Cd", name: "镉", group: 12, period: 5, related: [8, 9, 16, 17] },
+            { number: 49, symbol: "In", name: "铟", group: 13, period: 5, related: [8, 9, 16, 17] },
+            { number: 50, symbol: "Sn", name: "锡", group: 14, period: 5, related: [8, 9, 16, 17] },
+            { number: 51, symbol: "Sb", name: "锑", group: 15, period: 5, related: [8, 9, 16, 17] },
+            { number: 52, symbol: "Te", name: "碲", group: 16, period: 5, related: [8, 9, 16, 17] },
+            { number: 53, symbol: "I", name: "碘", group: 17, period: 5, related: [1, 3, 4, 6, 7, 8, 9, 11, 12, 13, 16, 19, 20] },
+            { number: 54, symbol: "Xe", name: "氙", group: 18, period: 5, related: [] },
+            
+            // 第六周期
+            { number: 55, symbol: "Cs", name: "铯", group: 1, period: 6, related: [8, 9, 16, 17] },
+            { number: 56, symbol: "Ba", name: "钡", group: 2, period: 6, related: [8, 9, 16, 17] },
+            { number: 57, symbol: "La", name: "镧", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 72, symbol: "Hf", name: "铪", group: 4, period: 6, related: [8, 9, 16, 17] },
+            { number: 73, symbol: "Ta", name: "钽", group: 5, period: 6, related: [8, 9, 16, 17] },
+            { number: 74, symbol: "W", name: "钨", group: 6, period: 6, related: [8, 9, 16, 17] },
+            { number: 75, symbol: "Re", name: "铼", group: 7, period: 6, related: [8, 9, 16, 17] },
+            { number: 76, symbol: "Os", name: "锇", group: 8, period: 6, related: [8, 9, 16, 17] },
+            { number: 77, symbol: "Ir", name: "铱", group: 9, period: 6, related: [8, 9, 16, 17] },
+            { number: 78, symbol: "Pt", name: "铂", group: 10, period: 6, related: [8, 9, 16, 17] },
+            { number: 79, symbol: "Au", name: "金", group: 11, period: 6, related: [8, 9, 16, 17] },
+            { number: 80, symbol: "Hg", name: "汞", group: 12, period: 6, related: [8, 9, 16, 17] },
+            { number: 81, symbol: "Tl", name: "铊", group: 13, period: 6, related: [8, 9, 16, 17] },
+            { number: 82, symbol: "Pb", name: "铅", group: 14, period: 6, related: [8, 9, 16, 17] },
+            { number: 83, symbol: "Bi", name: "铋", group: 15, period: 6, related: [8, 9, 16, 17] },
+            { number: 84, symbol: "Po", name: "钋", group: 16, period: 6, related: [8, 9, 16, 17] },
+            { number: 85, symbol: "At", name: "砹", group: 17, period: 6, related: [8, 9, 16, 17] },
+            { number: 86, symbol: "Rn", name: "氡", group: 18, period: 6, related: [] },
+            
+            // 第七周期
+            { number: 87, symbol: "Fr", name: "钫", group: 1, period: 7, related: [8, 9, 16, 17] },
+            { number: 88, symbol: "Ra", name: "镭", group: 2, period: 7, related: [8, 9, 16, 17] },
+            { number: 89, symbol: "Ac", name: "锕", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 104, symbol: "Rf", name: "鑪", group: 4, period: 7, related: [8, 9, 16, 17] },
+            { number: 105, symbol: "Db", name: "𨧀", group: 5, period: 7, related: [8, 9, 16, 17] },
+            { number: 106, symbol: "Sg", name: "𨭎", group: 6, period: 7, related: [8, 9, 16, 17] },
+            { number: 107, symbol: "Bh", name: "𨨏", group: 7, period: 7, related: [8, 9, 16, 17] },
+            { number: 108, symbol: "Hs", name: "𨭆", group: 8, period: 7, related: [8, 9, 16, 17] },
+            { number: 109, symbol: "Mt", name: "䥑", group: 9, period: 7, related: [8, 9, 16, 17] },
+            { number: 110, symbol: "Ds", name: "鐽", group: 10, period: 7, related: [8, 9, 16, 17] },
+            { number: 111, symbol: "Rg", name: "錀", group: 11, period: 7, related: [8, 9, 16, 17] },
+            { number: 112, symbol: "Cn", name: "鎶", group: 12, period: 7, related: [8, 9, 16, 17] },
+            { number: 113, symbol: "Nh", name: "鉨", group: 13, period: 7, related: [8, 9, 16, 17] },
+            { number: 114, symbol: "Fl", name: "鈇", group: 14, period: 7, related: [8, 9, 16, 17] },
+            { number: 115, symbol: "Mc", name: "镆", group: 15, period: 7, related: [8, 9, 16, 17] },
+            { number: 116, symbol: "Lv", name: "鉝", group: 16, period: 7, related: [8, 9, 16, 17] },
+            { number: 117, symbol: "Ts", name: "鿬", group: 17, period: 7, related: [8, 9, 16, 17] },
+            { number: 118, symbol: "Og", name: "鿫", group: 18, period: 7, related: [] }
+        ];
+
+        // 镧系元素
+        const lanthanides = [
+            { number: 58, symbol: "Ce", name: "铈", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 59, symbol: "Pr", name: "镨", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 60, symbol: "Nd", name: "钕", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 61, symbol: "Pm", name: "钷", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 62, symbol: "Sm", name: "钐", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 63, symbol: "Eu", name: "铕", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 64, symbol: "Gd", name: "钆", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 65, symbol: "Tb", name: "铽", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 66, symbol: "Dy", name: "镝", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 67, symbol: "Ho", name: "钬", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 68, symbol: "Er", name: "铒", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 69, symbol: "Tm", name: "铥", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 70, symbol: "Yb", name: "镱", group: 3, period: 6, related: [8, 9, 16, 17] },
+            { number: 71, symbol: "Lu", name: "镥", group: 3, period: 6, related: [8, 9, 16, 17] }
+        ];
+
+        // 锕系元素
+        const actinides = [
+            { number: 90, symbol: "Th", name: "钍", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 91, symbol: "Pa", name: "镤", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 92, symbol: "U", name: "铀", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 93, symbol: "Np", name: "镎", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 94, symbol: "Pu", name: "钚", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 95, symbol: "Am", name: "镅", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 96, symbol: "Cm", name: "锔", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 97, symbol: "Bk", name: "锫", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 98, symbol: "Cf", name: "锎", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 99, symbol: "Es", name: "锿", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 100, symbol: "Fm", name: "镄", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 101, symbol: "Md", name: "钔", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 102, symbol: "No", name: "锘", group: 3, period: 7, related: [8, 9, 16, 17] },
+            { number: 103, symbol: "Lr", name: "铹", group: 3, period: 7, related: [8, 9, 16, 17] }
+        ];
+
+        // 常见化合物
+        const compounds = {
+            "H2O": { name: "水", elements: [1, 8], formula: "H₂O", description: "水是地球上最常见的化合物，是生命存在的重要条件。" },
+            "NaCl": { name: "氯化钠", elements: [11, 17], formula: "NaCl", description: "氯化钠，俗称食盐，是日常饮食中重要的调味品。" },
+            "CO2": { name: "二氧化碳", elements: [6, 8], formula: "CO₂", description: "二氧化碳是大气中的重要成分，也是温室气体之一。" },
+            "NH3": { name: "氨", elements: [7, 1], formula: "NH₃", description: "氨是一种重要的工业原料，也用于制造肥料。" },
+            "CH4": { name: "甲烷", elements: [6, 1], formula: "CH₄", description: "甲烷是最简单的有机化合物，是天然气的主要成分。" },
+            "HCl": { name: "氯化氢", elements: [1, 17], formula: "HCl", description: "氯化氢溶于水形成盐酸，是一种强酸。" },
+            "H2SO4": { name: "硫酸", elements: [1, 16, 8], formula: "H₂SO₄", description: "硫酸是一种重要的工业化学品，用途广泛。" },
+            "CaCO3": { name: "碳酸钙", elements: [20, 6, 8], formula: "CaCO₃", description: "碳酸钙是石灰石和大理石的主要成分。" },
+            "Fe2O3": { name: "氧化铁", elements: [26, 8], formula: "Fe₂O₃", description: "氧化铁是铁锈的主要成分，常见于自然界中。" },
+            "Al2O3": { name: "氧化铝", elements: [13, 8], formula: "Al₂O₃", description: "氧化铝是铝的氧化物，常见于刚玉和红宝石中。" }
+        };
+
+        // 应用状态
+        let state = {
+            selectedElement: null,
+            relatedElements: [],
+            compound: null
+        };
+
+        // 初始化应用
+        function init() {
+            renderPeriodicTable();
+            renderLanthanides();
+            renderActinides();
+            setupEventListeners();
+        }
+
+        // 渲染主周期表
+        function renderPeriodicTable() {
+            const table = document.getElementById('periodicTable');
+            table.innerHTML = '';
+            
+            // 创建18列×10行的网格
+            for (let row = 1; row <= 10; row++) {
+                for (let col = 1; col <= 18; col++) {
+                    const element = elements.find(el => el.period === row && el.group === col);
+                    
+                    const elementDiv = document.createElement('div');
+                    if (element) {
+                        elementDiv.className = 'element';
+                        elementDiv.dataset.number = element.number;
+                        elementDiv.innerHTML = `
+                            <div class="element-number">${element.number}</div>
+                            <div class="element-symbol">${element.symbol}</div>
+                            <div class="element-name">${element.name}</div>
+                        `;
+                    } else {
+                        // 对于空位置，添加空的div
+                        elementDiv.className = 'empty';
+                    }
+                    
+                    table.appendChild(elementDiv);
+                }
+            }
+        }
+
+        // 渲染镧系元素
+        function renderLanthanides() {
+            const container = document.getElementById('lanthanides');
+            container.innerHTML = '';
+            
+            // 添加镧系元素
+            lanthanides.forEach(element => {
+                const elementDiv = document.createElement('div');
+                elementDiv.className = 'element';
+                elementDiv.dataset.number = element.number;
+                elementDiv.innerHTML = `
+                    <div class="element-number">${element.number}</div>
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>
+                `;
+                container.appendChild(elementDiv);
+            });
+        }
+
+        // 渲染锕系元素
+        function renderActinides() {
+            const container = document.getElementById('actinides');
+            container.innerHTML = '';
+            
+            // 添加锕系元素
+            actinides.forEach(element => {
+                const elementDiv = document.createElement('div');
+                elementDiv.className = 'element';
+                elementDiv.dataset.number = element.number;
+                elementDiv.innerHTML = `
+                    <div class="element-number">${element.number}</div>
+                    <div class="element-symbol">${element.symbol}</div>
+                    <div class="element-name">${element.name}</div>
+                `;
+                container.appendChild(elementDiv);
+            });
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 元素点击事件
+            document.querySelectorAll('.element').forEach(el => {
+                el.addEventListener('click', handleElementClick);
+            });
+            
+            // 重置按钮
+            document.getElementById('resetBtn').addEventListener('click', resetSelection);
+            
+            // 示例按钮
+            document.getElementById('exampleBtn').addEventListener('click', showExample);
+        }
+
+        // 处理元素点击
+        function handleElementClick(event) {
+            const elementNumber = parseInt(event.currentTarget.dataset.number);
+            const element = [...elements, ...lanthanides, ...actinides].find(el => el.number === elementNumber);
+            
+            if (!state.selectedElement) {
+                // 第一次点击，选择元素并高亮相关元素
+                selectElement(element);
+            } else if (state.relatedElements.includes(elementNumber) && state.selectedElement.number !== elementNumber) {
+                // 第二次点击，选择相关元素并形成化合物
+                formCompound(state.selectedElement, element);
+            } else if (state.selectedElement.number === elementNumber) {
+                // 点击已选元素，取消选择
+                resetSelection();
+            } else {
+                // 点击不相关元素，重新选择
+                resetSelection();
+                selectElement(element);
+            }
+        }
+
+        // 选择元素
+        function selectElement(element) {
+            state.selectedElement = element;
+            state.relatedElements = element.related;
+            
+            // 更新UI
+            updateElementHighlights();
+            
+            // 更新显示
+            document.getElementById('compoundDisplay').innerHTML = `
+                <p>已选择: <strong>${element.name} (${element.symbol})</strong></p>
+                <p>点击高亮元素形成化合物</p>
+            `;
+        }
+
+        // 更新元素高亮
+        function updateElementHighlights() {
+            // 移除所有高亮
+            document.querySelectorAll('.element').forEach(el => {
+                el.classList.remove('selected', 'related', 'compound');
+            });
+            
+            // 高亮选中的元素
+            const selectedElement = document.querySelector(`.element[data-number="${state.selectedElement.number}"]`);
+            if (selectedElement) {
+                selectedElement.classList.add('selected');
+            }
+            
+            // 高亮相关元素
+            state.relatedElements.forEach(number => {
+                const relatedElement = document.querySelector(`.element[data-number="${number}"]`);
+                if (relatedElement) {
+                    relatedElement.classList.add('related');
+                }
+            });
+        }
+
+        // 形成化合物
+        function formCompound(element1, element2) {
+            // 查找匹配的化合物
+            let compoundKey = null;
+            let compound = null;
+            
+            for (const [key, comp] of Object.entries(compounds)) {
+                const elementNumbers = comp.elements.sort();
+                const selectedNumbers = [element1.number, element2.number].sort();
+                
+                if (JSON.stringify(elementNumbers) === JSON.stringify(selectedNumbers)) {
+                    compoundKey = key;
+                    compound = comp;
+                    break;
+                }
+            }
+            
+            if (compound) {
+                state.compound = compound;
+                
+                // 更新UI
+                document.querySelectorAll('.element').forEach(el => {
+                    el.classList.remove('selected', 'related');
+                });
+                
+                const element1El = document.querySelector(`.element[data-number="${element1.number}"]`);
+                const element2El = document.querySelector(`.element[data-number="${element2.number}"]`);
+                
+                if (element1El) element1El.classList.add('compound');
+                if (element2El) element2El.classList.add('compound');
+                
+                // 显示化合物信息
+                document.getElementById('compoundDisplay').innerHTML = `
+                    <div>
+                        <p>形成的化合物: <strong>${compound.name} (${compound.formula})</strong></p>
+                        <p class="compound-info">${compound.description}</p>
+                        <a href="#" class="compound-link" onclick="showCompoundDetails('${compoundKey}')">查看化合物详情</a>
+                    </div>
+                `;
+            } else {
+                // 没有找到匹配的化合物
+                document.getElementById('compoundDisplay').innerHTML = `
+                    <p>${element1.name} (${element1.symbol}) 和 ${element2.name} (${element2.symbol}) 可以形成化合物</p>
+                    <p>但数据库中暂无此化合物的详细信息</p>
+                `;
+            }
+        }
+
+        // 重置选择
+        function resetSelection() {
+            state.selectedElement = null;
+            state.relatedElements = [];
+            state.compound = null;
+            
+            // 更新UI
+            document.querySelectorAll('.element').forEach(el => {
+                el.classList.remove('selected', 'related', 'compound');
+            });
+            
+            document.getElementById('compoundDisplay').innerHTML = `
+                <p>选择一个元素开始...</p>
+            `;
+        }
+
+        // 显示示例
+        function showExample() {
+            resetSelection();
+            
+            // 模拟点击氢元素
+            const hydrogen = elements.find(el => el.number === 1);
+            selectElement(hydrogen);
+            
+            // 2秒后模拟点击氧元素
+            setTimeout(() => {
+                const oxygen = elements.find(el => el.number === 8);
+                formCompound(hydrogen, oxygen);
+            }, 2000);
+        }
+
+        // 显示化合物详情（在实际应用中，这里会跳转到新页面）
+        function showCompoundDetails(compoundKey) {
+            const compound = compounds[compoundKey];
+            alert(`化合物详情:\n\n名称: ${compound.name}\n化学式: ${compound.formula}\n描述: ${compound.description}\n\n在实际应用中，这里会跳转到化合物详情页面。`);
+        }
+
+        // 初始化应用
+        window.onload = init;
+    </script>
+</body>
+</html>
