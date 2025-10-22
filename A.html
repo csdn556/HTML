@@ -26,7 +26,7 @@
         
         header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
@@ -53,58 +53,12 @@
             line-height: 1.5;
         }
         
-        .compound-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .compound-display {
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-        }
-        
-        .compound-info {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 1.2rem;
-        }
-        
-        .compound-link {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: rgba(50, 205, 50, 0.7);
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-        
-        .compound-link:hover {
-            background: rgba(50, 205, 50, 0.9);
-            transform: scale(1.05);
-        }
-        
-        .periodic-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        
         .periodic-table {
             display: grid;
             grid-template-columns: repeat(18, 1fr);
             grid-template-rows: repeat(10, 1fr);
             gap: 4px;
-            margin: 0 auto;
+            margin: 30px auto;
             max-width: 1000px;
         }
         
@@ -164,28 +118,12 @@
             cursor: default;
         }
         
-        .lanthanides-actinides {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-            width: 100%;
-            max-width: 1000px;
-        }
-        
         .lanthanides, .actinides {
             display: grid;
             grid-template-columns: repeat(15, 1fr);
             gap: 4px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .series-title {
-            text-align: center;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 1.1rem;
+            margin: 10px auto;
+            max-width: 830px;
         }
         
         .controls {
@@ -209,6 +147,41 @@
         button:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
+        }
+        
+        .compound-display {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        
+        .compound-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .compound-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: rgba(50, 205, 50, 0.7);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .compound-link:hover {
+            background: rgba(50, 205, 50, 0.9);
+            transform: scale(1.05);
         }
         
         footer {
@@ -257,37 +230,29 @@
             <p><strong>使用说明：</strong> 首先点击一个元素，与其相关的元素会高亮显示。然后点击高亮元素中的一个，这两个元素将形成一个化合物。点击化合物链接查看详情。</p>
         </div>
         
-        <div class="compound-section">
-            <div class="compound-display" id="compoundDisplay">
-                <p>选择一个元素开始...</p>
-            </div>
-        </div>
-        
         <div class="controls">
             <button id="resetBtn">重置选择</button>
             <button id="exampleBtn">查看示例</button>
         </div>
         
-        <div class="periodic-container">
-            <div class="periodic-table" id="periodicTable">
-                <!-- 元素周期表将通过JavaScript动态生成 -->
-            </div>
-            
-            <div class="lanthanides-actinides">
-                <div class="series-title">镧系元素</div>
-                <div class="lanthanides" id="lanthanides">
-                    <!-- 镧系元素 -->
-                </div>
-                
-                <div class="series-title">锕系元素</div>
-                <div class="actinides" id="actinides">
-                    <!-- 锕系元素 -->
-                </div>
-            </div>
+        <div class="periodic-table" id="periodicTable">
+            <!-- 元素周期表将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="lanthanides" id="lanthanides">
+            <!-- 镧系元素 -->
+        </div>
+        
+        <div class="actinides" id="actinides">
+            <!-- 锕系元素 -->
+        </div>
+        
+        <div class="compound-display" id="compoundDisplay">
+            <p>选择一个元素开始...</p>
         </div>
         
         <footer>
-            <p>交互式元素周期表 &copy; 2025 | 学校</p>
+            <p>交互式元素周期表 &copy; 2023 | 教育用途</p>
         </footer>
     </div>
 
@@ -498,6 +463,14 @@
             const container = document.getElementById('lanthanides');
             container.innerHTML = '';
             
+            // 添加标题
+            const title = document.createElement('div');
+            title.style.gridColumn = '1 / span 15';
+            title.style.textAlign = 'center';
+            title.style.padding = '5px';
+            title.textContent = '镧系元素';
+            container.appendChild(title);
+            
             // 添加镧系元素
             lanthanides.forEach(element => {
                 const elementDiv = document.createElement('div');
@@ -516,6 +489,14 @@
         function renderActinides() {
             const container = document.getElementById('actinides');
             container.innerHTML = '';
+            
+            // 添加标题
+            const title = document.createElement('div');
+            title.style.gridColumn = '1 / span 15';
+            title.style.textAlign = 'center';
+            title.style.padding = '5px';
+            title.textContent = '锕系元素';
+            container.appendChild(title);
             
             // 添加锕系元素
             actinides.forEach(element => {
